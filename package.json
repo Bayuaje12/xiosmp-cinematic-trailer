@@ -1,0 +1,27 @@
+{
+  "name": "xiosmp-trailer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cinematic motion graphics trailer for XIOSMP Minecraft server",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion bundle",
+    "render:landscape": "remotion render XIOSMP-Landscape out/XIOSMP_Landscape.mp4",
+    "render:vertical": "remotion render XIOSMP-Vertical out/XIOSMP_Vertical.mp4",
+    "render:all": "npm run render:landscape && npm run render:vertical",
+    "check": "node ./node_modules/typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.278",
+    "@remotion/media-utils": "4.0.278",
+    "@remotion/transitions": "4.0.278",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.278"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "typescript": "5.6.3"
+  }
+}

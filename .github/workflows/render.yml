@@ -1,0 +1,81 @@
+name: Render XIOSMP Trailer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'remotion.config.ts'
+      - '.github/workflows/render.yml'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
+            libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64 || \
+          sudo apt-get install -y ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Approve esbuild install script if needed
+        run: |
+          node node_modules/esbuild/install.js || true
+
+      - name: TypeScript check
+        run: npm run check
+
+      - name: Ensure output directory
+        run: mkdir -p out
+
+      - name: Render thumbnail
+        run: npx remotion still XIOSMP-Landscape out/thumbnail.png --frame=250 || true
+
+      - name: Render landscape
+        run: npx remotion render XIOSMP-Landscape out/XIOSMP_Landscape.mp4 --codec=h264 --audio-codec=aac
+
+      - name: Render vertical
+        run: npx remotion render XIOSMP-Vertical out/XIOSMP_Vertical.mp4 --codec=h264 --audio-codec=aac
+
+      - name: Validate outputs
+        run: |
+          set -e
+          ls -lh out
+          for f in out/XIOSMP_Landscape.mp4 out/XIOSMP_Vertical.mp4; do
+            test -f "$f"
+            ffprobe -v error -show_entries format=duration,size -show_streams "$f"
+            ffprobe -v error -select_streams a:0 -show_entries stream=codec_name "$f" | grep codec_name
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xiosmp-trailer
+          if-no-files-found: error
+          path: |
+            out/XIOSMP_Landscape.mp4
+            out/XIOSMP_Vertical.mp4
+            out/thumbnail.png
+            VOICE_OVER_SCRIPT.md
+            AUDIO_TIMING.md
+            ASSET_DOCUMENTATION.md
+            README.md
