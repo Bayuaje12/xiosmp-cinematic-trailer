@@ -7,7 +7,7 @@ Karakter suara target:
 - Pengucapan Bahasa Indonesia jelas
 - Bukan suara robot, bukan suara perempuan
 
-Status saat ini: **belum dibuat sebagai file audio** (TTS laki-laki Bahasa Indonesia berkualitas tinggi tidak tersedia di lingkungan Termux ini; `termux-tts-speak` hanya pemutaran langsung tanpa ekspor file audio). Sistem project menyiapkan jalur audio agar rekaman VO laki-laki dapat dimasukkan kemudian.
+Status saat ini: **file audio VO laki-laki (Bahasa Indonesia) telah dibuat** menggunakan TTS `edge-tts` dengan suara **id-ID-ArdiNeural** (Male), penyesuaian cinematic (`--rate=-8% --pitch=-10Hz`), dan disimpan di `public/audio/vo/scene1.mp3`–`scene7.mp3`. File ini juga sudah dicampurkan ke `XIOSMP_Landscape.mp4` di folder Download. Untuk kualitas announcer manusia yang lebih natural/berwibawa, Anda dapat mengganti file-file tersebut dengan rekaman suara laki-laki asli (nama file & timestamp tetap).
 
 ## Naskah dan Timestamp
 
