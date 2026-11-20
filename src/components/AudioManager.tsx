@@ -1,14 +1,18 @@
 import React from 'react';
 import {Audio, Sequence, interpolate, staticFile, useVideoConfig} from 'remotion';
-import {SCENE_TIMINGS} from '../theme';
 
-const sfx = (path: string, fromSeconds: number, volume = 0.5, durationSeconds?: number) => {
+const SFX: React.FC<{src: string; fromSec: number; durationSec?: number; volume?: number}> = ({
+  src,
+  fromSec,
+  durationSec,
+  volume = 0.5,
+}) => {
   const {fps} = useVideoConfig();
-  const from = Math.round(fromSeconds * fps);
-  const durationInFrames = durationSeconds ? Math.round(durationSeconds * fps) : undefined;
+  const from = Math.round(fromSec * fps);
+  const durationInFrames = durationSec ? Math.round(durationSec * fps) : undefined;
   return (
     <Sequence from={from} durationInFrames={durationInFrames}>
-      <Audio src={staticFile(path)} volume={volume} />
+      <Audio src={staticFile(src)} volume={volume} />
     </Sequence>
   );
 };
@@ -17,7 +21,6 @@ export const AudioManager: React.FC = () => {
   const {fps, durationInFrames} = useVideoConfig();
 
   const bgmVolume = (f: number) => {
-    // base ~0.55, duck slightly during VO windows
     const voWindows = [
       [0.5 * fps, 6.5 * fps],
       [7.3 * fps, 11.5 * fps],
@@ -36,28 +39,30 @@ export const AudioManager: React.FC = () => {
 
   return (
     <>
+      {/* Background music - full duration */}
       <Audio src={staticFile('audio/bgm/main.wav')} volume={bgmVolume} />
+      {/* Ambient bed */}
       <Audio src={staticFile('audio/sfx/ambient_wind.wav')} volume={0.12} />
 
       {/* Intro */}
-      {sfx('audio/sfx/riser_intro.wav', 0.4, 0.35, 2)}
+      <SFX src="audio/sfx/riser_intro.wav" fromSec={0.4} durationSec={2} volume={0.35} />
       {/* Scene 2 Logo reveal */}
-      {sfx('audio/sfx/whoosh_impact_logo.wav', 7.0, 0.45, 1.2)}
-      {sfx('audio/sfx/impact_logo.wav', 7.25, 0.55, 1.5)}
-      {sfx('audio/sfx/sparkle.wav', 7.6, 0.28, 1.2)}
-      {sfx('audio/sfx/transition_sweep.wav', 13.8, 0.3, 0.8)}
+      <SFX src="audio/sfx/whoosh_impact_logo.wav" fromSec={7.0} durationSec={1.2} volume={0.45} />
+      <SFX src="audio/sfx/impact_logo.wav" fromSec={7.25} durationSec={1.5} volume={0.55} />
+      <SFX src="audio/sfx/sparkle.wav" fromSec={7.6} durationSec={1.2} volume={0.28} />
+      <SFX src="audio/sfx/transition_sweep.wav" fromSec={13.8} durationSec={0.8} volume={0.3} />
       {/* Scene 3 */}
-      {sfx('audio/sfx/transition_sweep.wav', 26.8, 0.28, 0.8)}
+      <SFX src="audio/sfx/transition_sweep.wav" fromSec={26.8} durationSec={0.8} volume={0.28} />
       {/* Scene 4 */}
-      {sfx('audio/sfx/transition_sweep.wav', 37.8, 0.28, 0.8)}
+      <SFX src="audio/sfx/transition_sweep.wav" fromSec={37.8} durationSec={0.8} volume={0.28} />
       {/* Scene 5 */}
-      {sfx('audio/sfx/riser_mid.wav', 38.0, 0.32, 2.5)}
-      {sfx('audio/sfx/transition_sweep.wav', 45.8, 0.3, 0.8)}
+      <SFX src="audio/sfx/riser_mid.wav" fromSec={38.0} durationSec={2.5} volume={0.32} />
+      <SFX src="audio/sfx/transition_sweep.wav" fromSec={45.8} durationSec={0.8} volume={0.3} />
       {/* Scene 6 */}
-      {sfx('audio/sfx/impact_server.wav', 46.0, 0.5, 1.8)}
-      {sfx('audio/sfx/transition_sweep.wav', 54.8, 0.28, 0.8)}
+      <SFX src="audio/sfx/impact_server.wav" fromSec={46.0} durationSec={1.8} volume={0.5} />
+      <SFX src="audio/sfx/transition_sweep.wav" fromSec={54.8} durationSec={0.8} volume={0.28} />
       {/* Scene 7 */}
-      {sfx('audio/sfx/final_hit.wav', 55.0, 0.5, 3.0)}
+      <SFX src="audio/sfx/final_hit.wav" fromSec={55.0} durationSec={3.0} volume={0.5} />
     </>
   );
 };

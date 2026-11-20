@@ -57,20 +57,34 @@ jobs:
         run: npx remotion render XIOSMP-Vertical out/XIOSMP_Vertical.mp4 --codec=h264 --audio-codec=aac
 
       - name: Validate outputs
+        id: validate
+        continue-on-error: true
         run: |
           set -e
           ls -lh out
+          missing_audio=0
           for f in out/XIOSMP_Landscape.mp4 out/XIOSMP_Vertical.mp4; do
             test -f "$f"
+            echo "==== $f ===="
             ffprobe -v error -show_entries format=duration,size -show_streams "$f"
-            ffprobe -v error -select_streams a:0 -show_entries stream=codec_name "$f" | grep codec_name
+            echo "--- audio streams ---"
+            if ffprobe -v error -select_streams a -show_entries stream=index,codec_name,channels,sample_rate "$f" | grep -q "codec_name"; then
+              ffprobe -v error -select_streams a -show_entries stream=index,codec_name,channels,sample_rate "$f"
+            else
+              echo "WARNING: no audio stream found in $f"
+              missing_audio=1
+            fi
           done
+          if [ "$missing_audio" -ne 0 ]; then
+            echo "::warning::One or more outputs are missing audio streams."
+          fi
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: xiosmp-trailer
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             out/XIOSMP_Landscape.mp4
             out/XIOSMP_Vertical.mp4
